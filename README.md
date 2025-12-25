@@ -1,4 +1,4 @@
-# Archon — NBA Prediction & Learning Pipeline
+# Archon — NBA Prediction & Training Pipeline
 
 A compact end-to-end pipeline for producing NBA matchup predictions, performing metric-driven learning, and debugging parameter trajectories.  
 This project implements a lightweight "Archon" engine that:
@@ -256,4 +256,4 @@ MIT License — adapt and reuse as needed.
 
 If you'd like, I can:
 - Produce example CSVs (small master + coach + stadium + actuals) so you can run the pipeline end-to-end locally, or
-- Add a simple Dockerfile or GitHub Actions workflow to run nightly predictions and save artifacts. Which would you prefer?# NBA-cce5.0
+- Add a simple Dockerfile or GitHub Actions workflow to run nightly predictions and save artifacts. Which would you prefer?
