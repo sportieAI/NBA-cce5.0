@@ -1,1 +1,79 @@
+name: Nightly Archon predictions (save to Drive - SA JSON)
 
+on:
+  schedule:
+    - cron: '0 5 * * *'   # Every day at 05:00 UTC (adjust as needed)
+  workflow_dispatch:
+
+jobs:
+  predict_and_upload:
+    runs-on: ubuntu-latest
+    env:
+      OUTPUT_DIR: outputs
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+
+      - name: Install Python dependencies
+        run: |
+          python -m pip install --upgrade pip
+          if [ -f requirements.txt ]; then pip install --no-cache-dir -r requirements.txt; fi
+
+      - name: Create outputs directory
+        run: mkdir -p "${{ env.OUTPUT_DIR }}"
+
+      - name: Run Archon predictions
+        run: |
+          TIMESTAMP=$(date -u +"%Y%m%dT%H%M%SZ")
+          OUT="${{ env.OUTPUT_DIR }}/archon_predictions_${TIMESTAMP}.csv"
+          python scripts/run_archon.py --master sample_data/archon_master_data_normalized.csv \
+                                      --coach sample_data/archon_coach_iq.csv \
+                                      --stadium sample_data/archon_stadium_entropy.csv \
+                                      --output "${OUT}"
+          echo "Saved predictions to ${OUT}"
+
+      - name: Upload predictions as workflow artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: archon-predictions
+          path: ${{ env.OUTPUT_DIR }}/*.csv
+
+      - name: Install rclone
+        run: |
+          curl -fsSL https://rclone.org/install.sh | sudo bash
+
+      - name: Write service-account JSON (from secret)
+        if: ${{ secrets.RCLONE_SA_JSON != '' }}
+        env:
+          RCLONE_SA_JSON: ${{ secrets.RCLONE_SA_JSON }}
+        run: |
+          echo "$RCLONE_SA_JSON" > /tmp/rclone_sa.json
+          chmod 600 /tmp/rclone_sa.json
+          echo "Wrote /tmp/rclone_sa.json (service account JSON)"
+
+      - name: Write rclone config referencing service-account JSON
+        if: ${{ secrets.RCLONE_SA_JSON != '' }}
+        run: |
+          mkdir -p ~/.config/rclone
+          cat > ~/.config/rclone/rclone.conf <<'EOF'
+[gdrive]
+type = drive
+scope = drive
+service_account_file = /tmp/rclone_sa.json
+token = {}
+EOF
+          chmod 600 ~/.config/rclone/rclone.conf
+          echo "Wrote rclone config at ~/.config/rclone/rclone.conf"
+
+      - name: Copy outputs to Google Drive via rclone
+        if: ${{ secrets.RCLONE_SA_JSON != '' && secrets.RCLONE_REMOTE != '' }}
+        env:
+          RCLONE_REMOTE: ${{ secrets.RCLONE_REMOTE }}
+        run: |
+          echo "Copying outputs to remote: ${RCLONE_REMOTE}"
+          rclone copy "${{ env.OUTPUT_DIR }}" "${RCLONE_REMOTE}" --no-traverse --verbose
