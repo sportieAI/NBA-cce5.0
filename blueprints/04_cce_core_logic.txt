@@ -1,0 +1,1 @@
+LINK: WS02,ANCHOR: DeltaW,0.30 Physics,0.30 Det,0.25 VPos,0.15 Decay,0.30P+0.30D+0.25V+0.15X,Fatigue Adj,alpha*signal,PARAM: Alpha

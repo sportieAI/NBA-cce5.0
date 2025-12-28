@@ -1,0 +1,1 @@
+SOURCE: WS02,KEY: Date,ALGO: rolling(90).mean(),ALGO: rolling(90).std(),ALGO: rolling(90).mean(),ALGO: rolling(90).std(),ALGO: rolling(90).median(),ALGO: rolling(90).iqr(),ALGO: count

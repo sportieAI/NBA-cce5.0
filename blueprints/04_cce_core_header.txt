@@ -1,0 +1,1 @@
+game_id,DeltaW_Fund,physics,deterrence,v_pos,decay_x_z,win_signal,win_signal_adj,signal_points,alpha_used

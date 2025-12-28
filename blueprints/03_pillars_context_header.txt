@@ -1,0 +1,1 @@
+team,date,rolling_90_netrtg_mean,rolling_90_netrtg_std,rolling_90_efg_mean,rolling_90_efg_std,rolling_90_vpos_median,rolling_90_decay_iqr,last_30_games_count

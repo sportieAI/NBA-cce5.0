@@ -1,0 +1,1 @@
+game_id,omega_gravity_epm,omega_pc_d,omega_venue,omega_loadgage,omega_media_bias,omega_other,omega_sum
